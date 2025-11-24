@@ -1,0 +1,41 @@
+import { useEffect } from "react";
+import { View } from "react-native";
+import { VideoView, useVideoPlayer } from "expo-video";
+import { Text } from "react-native";
+
+interface AnimatedScreenProps {
+  setShowAnimation: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export default function AnimationScreen({
+  setShowAnimation,
+}: AnimatedScreenProps) {
+  const player = useVideoPlayer(require("@/assets/splash/video.mp4"), (playerInstance) => {
+    playerInstance.loop = true;
+    playerInstance.muted = true;
+    playerInstance.play();
+  });
+
+  useEffect(() => {
+    const subscription = player.addListener("playToEnd", () => {
+      setShowAnimation(false);
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [player, setShowAnimation]);
+
+  return (
+    <View className="flex-1 items-center justify-center bg-[#f4f4f4] px-6 dark:bg-black">
+      <VideoView
+        player={player}
+        contentFit="contain"
+        style={{
+          width: "150%",
+          height: "100%",
+        }}
+      />
+    </View>
+  );
+}
