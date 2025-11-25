@@ -1,17 +1,16 @@
-import { ScrollView, View, TextInput } from 'react-native';
+import { ScrollView, View, TextInput, Pressable } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { ScreenHeader } from '@/components/ui/screen-header';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 export default function UmidityScreen() {
   const [currentHumidity] = useState(75); // Mock current humidity
   const [limitHumidity, setLimitHumidity] = useState('40');
+  const inputRef = useRef<TextInput>(null);
 
   const handleLimitChange = (value: string) => {
-    // Remove non-numeric characters
     const numericValue = value.replace(/[^0-9]/g, '');
     
-    // Ensure value is between 0 and 100
     if (numericValue === '') {
       setLimitHumidity('');
       return;
@@ -21,6 +20,13 @@ export default function UmidityScreen() {
     if (numValue >= 0 && numValue <= 100) {
       setLimitHumidity(numericValue);
     }
+  };
+
+  const handlePress = () => {
+    inputRef.current?.focus();
+    setTimeout(() => {
+      inputRef.current?.setNativeProps({ selection: { start: 0, end: 0 } });
+    }, 100);
   };
 
   return (
@@ -47,18 +53,21 @@ export default function UmidityScreen() {
           <Text className="text-ink-light text-sm mb-4">
             Defina o nível mínimo de umidade. Quando a umidade estiver abaixo deste valor, a irrigação será ativada automaticamente.
           </Text>
-          <View className="bg-snow rounded-2xl px-6 py-4 border border-silver flex-row items-center justify-center gap-2 min-h-[120px]" >
-            <TextInput
-              value={limitHumidity}
-              onChangeText={handleLimitChange}
-              keyboardType="numeric"
-              maxLength={3}
-              className="text-ink text-5xl leading-[60px]"
-              placeholder="40"
-              placeholderTextColor="#777777"
-            />
-            <Text className="text-ink text-3xl font-nunito-bold">%</Text>
-          </View>
+          <Pressable onPress={handlePress}>
+            <View className="bg-snow rounded-2xl px-6 py-4 border border-silver flex-row items-center justify-center gap-2 min-h-[120px]" >
+              <TextInput
+                ref={inputRef}
+                value={limitHumidity}
+                onChangeText={handleLimitChange}
+                keyboardType="numeric"
+                maxLength={3}
+                className="text-ink text-5xl leading-[60px] flex-1 text-center"
+                placeholder="40"
+                placeholderTextColor="#777777"
+              />
+              <Text className="text-ink text-3xl font-nunito-bold">%</Text>
+            </View>
+          </Pressable>
         </View>
 
         <View className="mt-6 mb-6">
