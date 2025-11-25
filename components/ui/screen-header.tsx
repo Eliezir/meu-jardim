@@ -24,7 +24,7 @@ export function ScreenHeader({ title }: { title?: string }) {
         </Pressable>
       )}
       {title && (
-        <Text className="text-garden-green text-2xl font-nunito-bold flex-1">
+        <Text className="text-garden-green text-3xl font-nunito-semibold flex-1">
           {title}
         </Text>
       )}

@@ -8,6 +8,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 import { useState } from 'react';
+import { View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 
@@ -20,19 +21,20 @@ export default function RootLayout() {
   const [ showAnimation, setShowAnimation] = useState(true);
   const { colorScheme } = useColorScheme();
 
-
   return (
     <SafeAreaProvider>
       <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
-        {showAnimation && <AnimationScreen setShowAnimation={setShowAnimation} />}
-        {!showAnimation && (
-          <SafeAreaView edges={['top', 'bottom']} className="flex-1">
-            <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen/>
-            </Stack>
-            <PortalHost />
-          </SafeAreaView>
+        <SafeAreaView edges={['top', 'bottom']} className="flex-1">
+          <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen />
+          </Stack>
+          <PortalHost />
+        </SafeAreaView>
+        {showAnimation && (
+          <View className="absolute inset-0 z-50">
+            <AnimationScreen setShowAnimation={setShowAnimation} />
+          </View>
         )}
       </ThemeProvider>
     </SafeAreaProvider>

@@ -55,16 +55,14 @@ export default function HomeScreen() {
 
   const cardItems: CardItem[] = useMemo(() => [
     {
-      id: 'time',
+      id: 'schedule',
       icon: Timer,
       value: irrigationData.duration,
-      text: 'Tempo de irrigação',
-      secondaryValue: irrigationData.timeLeft,
-      secondaryText: 'Tempo restante',
-      color: 'garden-green',
+      text: 'Para aproxima irrigação',
+      color: 'purple-500',
       width: 'full',
-      minHeight: 130,
-      onPress: () => router.push('/time'),
+      minHeight: 80,
+      onPress: () => router.push('/schedule'),
     },
     {
       id: 'umidade',
@@ -133,8 +131,6 @@ export default function HomeScreen() {
               icon={card.icon}
               value={card.value}
               text={card.text}
-              secondaryValue={card.secondaryValue}
-              secondaryText={card.secondaryText}
               iconColor={`text-${card.color}`}
             />
           </Button>
