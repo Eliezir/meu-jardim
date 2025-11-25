@@ -1,77 +1,146 @@
-import { Button } from '@/components/ui/button';
-import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
-import { Link, Stack } from 'expo-router';
-import { MoonStarIcon, StarIcon, SunIcon } from 'lucide-react-native';
-import { useColorScheme } from 'nativewind';
-import * as React from 'react';
-import { Image, type ImageStyle, View } from 'react-native';
+import { Button } from '@/components/ui/button';
+import { CardContent } from '@/components/ui/card-content';
+import { ScrollView, View } from 'react-native';
+import { Timer, Droplets, Map, Cloud, Play, Square } from 'lucide-react-native';
+import { useMemo } from 'react';
+import { cn } from '@/lib/utils';
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
 
-const LOGO = {
-  light: require('@/assets/images/react-native-reusables-light.png'),
-  dark: require('@/assets/images/react-native-reusables-dark.png'),
-};
+export default function HomeScreen() {
+  const router = useRouter();
+    const [isRunning, setIsRunning] = useState(false);
 
-const SCREEN_OPTIONS = {
-  title: 'React Native Reusables',
-  headerTransparent: true,
-  headerRight: () => <ThemeToggle />,
-};
+  const timeBasedGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) {
+      return 'Bom dia';
+    } else if (hour >= 12 && hour < 18) {
+      return 'Boa tarde';
+    } else {
+      return 'Boa noite';
+    }
+  };
 
-const IMAGE_STYLE: ImageStyle = {
-  height: 76,
-  width: 76,
-};
+  // Mock data - replace with real data from Firebase later
+  const irrigationData = useMemo(() => {
+    // Example: irrigation scheduled for 2 hours from now
+    const now = new Date();
+    const nextIrrigation = new Date(now.getTime() + 2 * 60 * 60 * 1000); // 2 hours from now
+    const timeLeft = Math.floor((nextIrrigation.getTime() - now.getTime()) / (60 * 1000)); // minutes
+    
+    const hours = Math.floor(timeLeft / 60);
+    const minutes = timeLeft % 60;
+    
+    return {
+      duration: '15 min', // Defined irrigation time
+      timeLeft: hours > 0 ? `${hours}h ${minutes}min` : `${minutes}min`,
+    };
+  }, []);
 
-export default function Screen() {
-  const { colorScheme } = useColorScheme();
+  type CardItem = {
+    id: string;
+    icon: typeof Timer;
+    value: string | number;
+    text: string;
+    secondaryValue?: string | number;
+    secondaryText?: string;
+    color: string;
+    variant?: 'card';
+    width: 'full' | 'half';
+    minHeight: number;
+    onPress: () => void;
+  };
 
+  const cardItems: CardItem[] = useMemo(() => [
+    {
+      id: 'time',
+      icon: Timer,
+      value: irrigationData.duration,
+      text: 'Tempo de irrigação',
+      secondaryValue: irrigationData.timeLeft,
+      secondaryText: 'Tempo restante',
+      color: 'garden-green',
+      width: 'full',
+      minHeight: 130,
+      onPress: () => router.push('/time'),
+    },
+    {
+      id: 'umidade',
+      icon: Droplets,
+      value: '75%',
+      text: 'Umidade',
+      color: 'water-blue',
+      width: 'half',
+      minHeight: 80,
+      onPress: () => router.push('/humidity'),
+    },
+    {
+      id: 'zones',
+      icon: Map,
+      value: 3,
+      text: 'Zonas',
+      color: 'garden-green',
+      width: 'half',
+      minHeight: 80,
+      onPress: () => router.push('/zones'),
+    },
+    {
+      id: 'forecast',
+      icon: Cloud,
+      value: 'Ensolarado',
+      text: 'Previsão',
+      color: 'warning-orange',
+      width: 'full',
+      minHeight: 80,
+      onPress: () => router.push('/forecast'),
+    },
+    {
+      id: 'start-stop',
+      icon: isRunning ? Square : Play,
+      value: isRunning ? 'Pausar' : 'Iniciar',
+      text: isRunning ? 'Irrigação em andamento' : 'Tudo pronto para regar seu jardim',
+      color: isRunning ? 'alert-red' : 'garden-green',
+      width: 'full',
+      minHeight: 80,
+      onPress: () => setIsRunning(!isRunning),
+    },
+  ], [irrigationData, isRunning]);
+
+  // TODO: Change the celebration message to a forecast message
   return (
-    <>
-      <Stack.Screen options={SCREEN_OPTIONS} />
-      <View className="flex-1 items-center justify-center gap-8 p-4">
-        <Image source={LOGO[colorScheme ?? 'light']} style={IMAGE_STYLE} resizeMode="contain" />
-        <View className="gap-2 p-4">
-          <Text className="ios:text-foreground font-mono text-sm text-muted-foreground">
-            1. Edit <Text variant="code">app/index.tsx</Text> to get started.
-          </Text>
-          <Text className="ios:text-foreground font-mono text-sm text-muted-foreground">
-            2. Save to see your changes instantly.
-          </Text>
-        </View>
-        <View className="flex-row gap-2">
-          <Link href="https://reactnativereusables.com" asChild>
-            <Button>
-              <Text>Browse the Docs</Text>
-            </Button>
-          </Link>
-          <Link href="https://github.com/founded-labs/react-native-reusables" asChild>
-            <Button variant="ghost">
-              <Text>Star the Repo</Text>
-              <Icon as={StarIcon} />
-            </Button>
-          </Link>
-        </View>
+    <ScrollView className="flex-1 bg-polar px-6 py-12">
+      <View>
+        <Text className="text-ink-light text-xl font-semibold">{timeBasedGreeting()},</Text>
+        <Text className="text-garden-green text-3xl font-nunito-bold">Dona Verônica</Text>
+        {/* {celebrationMessage && (
+          <Text className="text-ink-light text-base mt-4">{celebrationMessage}</Text>
+        )} */}
       </View>
-    </>
+
+      <View className="mt-8 gap-4 flex-row flex-wrap">
+        {cardItems.map((card) => (
+          <Button
+            key={card.id}
+            variant="card"
+            className={cn('bg-snow rounded-2xl px-4 py-3', 
+              card.width === 'half' ? 'w-[47.5%]' : 'w-full')}
+            style={{ minHeight: card.minHeight,}}
+            onPress={() => setTimeout(card.onPress, 200)}
+          >
+            <CardContent
+              icon={card.icon}
+              value={card.value}
+              text={card.text}
+              secondaryValue={card.secondaryValue}
+              secondaryText={card.secondaryText}
+              iconColor={`text-${card.color}`}
+            />
+          </Button>
+        ))}
+      </View>
+    </ScrollView>
   );
 }
 
-const THEME_ICONS = {
-  light: SunIcon,
-  dark: MoonStarIcon,
-};
-
-function ThemeToggle() {
-  const { colorScheme, toggleColorScheme } = useColorScheme();
-
-  return (
-    <Button
-      onPressIn={toggleColorScheme}
-      size="icon"
-      variant="ghost"
-      className="ios:size-9 rounded-full web:mx-4">
-      <Icon as={THEME_ICONS[colorScheme ?? 'light']} className="size-5" />
-    </Button>
-  );
-}

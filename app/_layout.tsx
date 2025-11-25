@@ -1,5 +1,6 @@
 import '@/global.css';
 
+import AnimationScreen from '@/components/AnimationScreen';
 import { NAV_THEME } from '@/lib/theme';
 import { ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
@@ -7,7 +8,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 import { useState } from 'react';
-import AnimationScreen from '@/components/AnimationScreen';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 
 export {
@@ -21,15 +22,19 @@ export default function RootLayout() {
 
 
   return (
-    <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
-      {showAnimation && <AnimationScreen setShowAnimation={setShowAnimation} />}
-    {!showAnimation && (
-      <>
-        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-        <Stack />
-        <PortalHost />
-      </>
-    )}
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
+        {showAnimation && <AnimationScreen setShowAnimation={setShowAnimation} />}
+        {!showAnimation && (
+          <SafeAreaView edges={['top', 'bottom']} className="flex-1">
+            <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen/>
+            </Stack>
+            <PortalHost />
+          </SafeAreaView>
+        )}
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }

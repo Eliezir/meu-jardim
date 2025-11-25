@@ -32,8 +32,9 @@ export default function AnimationScreen({
         player={player}
         contentFit="contain"
         style={{
-          width: "150%",
-          height: "100%",
+          width: 600,
+          height: 400,
+          marginRight: 60,
         }}
       />
     </View>

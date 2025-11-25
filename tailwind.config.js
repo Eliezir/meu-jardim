@@ -7,6 +7,12 @@ module.exports = {
   presets: [require('nativewind/preset')],
   theme: {
     extend: {
+      fontFamily: {
+        'nunito': ['Nunito_400Regular', 'system-ui'],
+        'nunito-semibold': ['Nunito_600SemiBold', 'system-ui'],
+        'nunito-bold': ['Nunito_700Bold', 'system-ui'],
+        'sans': ['Nunito_400Regular', 'system-ui'],
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
@@ -41,15 +47,46 @@ module.exports = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        'garden-green': {
+          DEFAULT: '#58CC02',
+          lip: '#46A302',
+          light: '#D7FFB8',
+        },
+        'water-blue': {
+          DEFAULT: '#1CB0F6',
+          lip: '#1899D6',
+          light: '#DDF4FF',
+        },
+        'alert-red': {
+          DEFAULT: '#FF4B4B',
+          lip: '#EA2B2B',
+        },
+        'warning-orange': {
+          DEFAULT: '#FF9600',
+          lip: '#CC7900',
+        },
+        'ink': {
+          DEFAULT: '#4B4B4B',
+          light: '#777777',
+        },
+        'snow': '#FFFFFF',
+        'polar': '#F5F5F5',
+        'silver': '#E5E5E5',
       },
+      
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+        'xl': '16px',
+        '2xl': '20px',
+        '3xl': '24px',
       },
+      
       borderWidth: {
         hairline: hairlineWidth(),
       },
+      
       keyframes: {
         'accordion-down': {
           from: { height: '0' },
@@ -60,6 +97,7 @@ module.exports = {
           to: { height: '0' },
         },
       },
+      
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',

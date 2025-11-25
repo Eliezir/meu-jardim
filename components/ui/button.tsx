@@ -37,6 +37,10 @@ const buttonVariants = cva(
           'active:bg-accent dark:active:bg-accent/50',
           Platform.select({ web: 'hover:bg-accent dark:hover:bg-accent/50' })
         ),
+        card: cn(
+          'bg-white rounded-[15px] border border-b-[4px] border-border active:translate-y-0.5 active:border-b-0 transition-all duration-200',
+          Platform.select({ web: 'cursor-pointer' })
+        ),
         link: '',
       },
       size: {
@@ -69,6 +73,7 @@ const buttonTextVariants = cva(
         ),
         secondary: 'text-secondary-foreground',
         ghost: 'group-active:text-accent-foreground',
+        card: 'text-[#1CB0F6] font-extrabold',
         link: cn(
           'text-primary group-active:underline',
           Platform.select({ web: 'underline-offset-4 hover:underline group-hover:underline' })
