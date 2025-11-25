@@ -50,6 +50,12 @@ export function TimePicker({
     setVisible(true);
   };
 
+  useEffect(() => {
+    onChange(tempFirst + ':' + tempSecond);
+  }, [tempFirst, tempSecond]);
+
+
+
 
   const firstOptions = mode === 'hour-minute' ? HOURS : MINUTES_SECONDS;
   const secondOptions = MINUTES_SECONDS;
@@ -65,16 +71,13 @@ export function TimePicker({
         <View className="rounded-2xl bg-snow px-4 py-3 min-w-[80px] items-center flex-1 aspect-square justify-center border border-silver ">
           <Text className="text-ink text-5xl font-nunito-bold">{value.split(':')[0]}</Text>
         </View>
-        <Text className="text-garden-greentext-5xl font-nunito-bold">:</Text>
+        <Text className="text-ink text-5xl font-nunito-bold">:</Text>
         <View className="rounded-2xl bg-snow px-4 py-3 min-w-[80px] items-center flex-1 aspect-square justify-center border border-silver ">
           <Text className="text-ink text-5xl font-nunito-bold">{value.split(':')[1]}</Text>
         </View>
       </Pressable>
 
-      <Dialog open={visible} onOpenChange={(open) => {
-        console.log('open', open);
-        setVisible(open);
-      }}>
+      <Dialog open={visible} onOpenChange={setVisible}>
         <DialogContent variant="bottom" className="bg-white p-6 gap-6">
           <View className="flex-row items-center gap-4 justify-center">
             <PickerColumn
@@ -84,7 +87,7 @@ export function TimePicker({
               onSelect={setTempFirst}
               modalVisible={visible}
             />
-            <Text className="text-ink text-3xl font-nunito-bold mt-10">:</Text>
+            <Text className="text-ink text-2xl font-nunito-bold mt-10">:</Text>
             <PickerColumn
               label={secondLabel}
               options={secondOptions}
@@ -182,7 +185,7 @@ function PickerColumn({ label, options, selectedValue, onSelect, modalVisible }:
               onLayout={handleItemLayout}
               className={cn(
                 'py-3 items-center',
-                selected && 'bg-garden-green border-garden-green-lip border border-b-4 rounded-lg mx-1 my-1 shadow-sm shadow-black/5'
+                selected && 'bg-garden-green border-garden-green-lip border border-b-4 rounded-lg mx-1 my-1'
               )}
             >
               <Text

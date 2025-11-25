@@ -10,6 +10,16 @@ export default function TimeScreen() {
   const [time, setTime] = useState('07:30');
 
   const weekDays = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
+
+
+const handleTimeChange = (time: string) => {
+  setTime(time);
+};
+
+const handleWeekDaysChange = (weekDays: string[]) => {
+  setSelectedWeekDays(weekDays);
+};
+
   return (
     <>
       <ScreenHeader title="Próxima Irrigação" />
@@ -17,9 +27,9 @@ export default function TimeScreen() {
       <Text className="text-ink-light text-base my-2">
       Configure e visualize os horários de irrigação do seu jardim.
           </Text>
-        <TimePicker mode="hour-minute" value={time} onChange={setTime} label="Horário de irrigação"/>
+        <TimePicker mode="hour-minute" value={time} onChange={handleTimeChange} label="Horário de irrigação"/>
         <View>
-        <ToggleGroup value={selectedWeekDays} onValueChange={setSelectedWeekDays} variant='depth' type='multiple'
+        <ToggleGroup value={selectedWeekDays} onValueChange={handleWeekDaysChange} variant='depth' type='multiple'
         className='gap-1 mt-4 flex flex-wrap'
         >
             {weekDays.map((day) => (
