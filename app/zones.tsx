@@ -1,17 +1,85 @@
 import { ScrollView, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { ScreenHeader } from '@/components/ui/screen-header';
+import { TimePicker } from '@/components/ui/time-picker';
+import { useState } from 'react';
 
 export default function ZonesScreen() {
+  const [zone1Time, setZone1Time] = useState('15:00');
+  const [zone2Time, setZone2Time] = useState('20:00');
+
   return (
     <>
-      <ScreenHeader title="Zonas" />
-      <ScrollView className="flex-1 bg-polar px-6 py-12">
-        <View>
-          <Text className="text-ink text-3xl font-nunito-bold">Zonas de Irrigação</Text>
-          <Text className="text-ink-light text-base mt-4">
-            Gerencie as diferentes zonas de irrigação do seu jardim.
+      <ScreenHeader title="Zonas de Irrigação" />
+      <ScrollView className="flex-1 bg-polar px-6">
+        <View className="mt-6">
+          <Text className="text-ink-light text-sm mb-4">
+            Configure a duração da irrigação para cada zona do seu jardim. Cada zona pode ter um tempo de irrigação diferente dependendo do tamanho e tipo de vegetação.
           </Text>
+        </View>
+
+        <View className="mt-6">
+          <View className="bg-water-blue-light rounded-2xl px-6 py-6 border-2 border-water-blue">
+            <View className="flex-row items-center gap-2 mb-4">
+              <View className="w-4 h-4 rounded-full bg-water-blue" />
+              <Text className="text-ink text-lg font-nunito-semibold">
+                Zona 1
+              </Text>
+            </View>
+            <Text className="text-ink-light text-sm mb-4">
+              Defina por quanto tempo a irrigação ficará ativa nesta zona. O tempo é medido em minutos e segundos.
+            </Text>
+            <TimePicker
+              mode="minute-second"
+              value={zone1Time}
+              onChange={setZone1Time}
+              color="blue"
+            />
+            <View className="mt-4 p-3 bg-white/50 rounded-lg">
+              <Text className="text-ink text-sm">
+                <Text className="font-nunito-semibold">Duração configurada:</Text> {zone1Time.split(':')[0]} minutos e {zone1Time.split(':')[1]} segundos
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        <View className="mt-6 mb-6">
+          <View className="bg-garden-green-light rounded-2xl px-6 py-6 border-2 border-garden-green">
+            <View className="flex-row items-center gap-2 mb-4">
+              <View className="w-4 h-4 rounded-full bg-garden-green" />
+              <Text className="text-ink text-lg font-nunito-semibold">
+                Zona 2
+              </Text>
+            </View>
+            <Text className="text-ink-light text-sm mb-4">
+              Defina por quanto tempo a irrigação ficará ativa nesta zona. O tempo é medido em minutos e segundos.
+            </Text>
+            <TimePicker
+              mode="minute-second"
+              value={zone2Time}
+              onChange={setZone2Time}
+              color="green"
+            />
+            <View className="mt-4 p-3 bg-white/50 rounded-lg">
+              <Text className="text-ink text-sm">
+                <Text className="font-nunito-semibold">Duração configurada:</Text> {zone2Time.split(':')[0]} minutos e {zone2Time.split(':')[1]} segundos
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        <View className="mb-6">
+          <View className="bg-snow rounded-2xl px-4 py-4 border border-silver">
+            <Text className="text-ink text-base font-nunito-semibold mb-2">
+              💡 Como funciona
+            </Text>
+            <Text className="text-ink-light text-sm leading-5 mb-3">
+              Cada zona representa uma área específica do seu jardim com suas próprias necessidades de irrigação. Quando a irrigação for ativada (por horário agendado ou quando a umidade estiver baixa), cada zona será irrigada pelo tempo configurado.
+            </Text>
+            <Text className="text-ink-light text-sm leading-5">
+              <Text className="font-nunito-semibold">Dica:</Text> Zonas maiores ou com plantas que precisam de mais água devem ter tempos de irrigação maiores. Ajuste os tempos conforme as necessidades específicas de cada área.
+            </Text>
+          </View>
         </View>
       </ScrollView>
     </>

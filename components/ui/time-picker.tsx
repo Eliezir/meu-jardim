@@ -21,6 +21,7 @@ type TimePickerProps = {
   mode?: TimePickerMode;
   className?: string;
   style?: StyleProp<ViewStyle>;
+  color?: 'blue' | 'green' | 'default';
 };
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
@@ -33,6 +34,7 @@ export function TimePicker({
   mode = 'hour-minute',
   className,
   style,
+  color = 'default',
 }: TimePickerProps) {
   const [visible, setVisible] = useState(false);
   const [tempFirst, setTempFirst] = useState('00');
@@ -60,6 +62,16 @@ export function TimePicker({
   const firstOptions = mode === 'hour-minute' ? HOURS : MINUTES_SECONDS;
   const secondOptions = MINUTES_SECONDS;
 
+  const borderColorClass = 
+    color === 'blue' ? 'border-water-blue' :
+    color === 'green' ? 'border-garden-green' :
+    'border-silver';
+
+  const textColorClass = 
+    color === 'blue' ? 'text-water-blue' :
+    color === 'green' ? 'text-garden-green' :
+    'text-ink';
+
   return (
     <View className={className} style={style}>
       {label && <Text className="text-ink text-base font-nunito-semibold mb-2">{label}</Text>}
@@ -68,12 +80,12 @@ export function TimePicker({
         className="flex-row items-center justify-center gap-3"
         accessibilityRole="button"
       >
-        <View className="rounded-2xl bg-snow px-4 py-3 min-w-[80px] items-center flex-1 aspect-square justify-center border border-silver ">
-          <Text className="text-ink text-5xl font-nunito-bold">{value.split(':')[0]}</Text>
+        <View className={cn("rounded-2xl bg-snow px-4 py-3 min-w-[80px] items-center flex-1 aspect-square justify-center border-2", borderColorClass)}>
+          <Text className={cn("text-5xl font-nunito-bold", textColorClass)}>{value.split(':')[0]}</Text>
         </View>
-        <Text className="text-ink text-5xl font-nunito-bold">:</Text>
-        <View className="rounded-2xl bg-snow px-4 py-3 min-w-[80px] items-center flex-1 aspect-square justify-center border border-silver ">
-          <Text className="text-ink text-5xl font-nunito-bold">{value.split(':')[1]}</Text>
+        <Text className={cn("text-5xl font-nunito-bold", textColorClass)}>:</Text>
+        <View className={cn("rounded-2xl bg-snow px-4 py-3 min-w-[80px] items-center flex-1 aspect-square justify-center border-2", borderColorClass)}>
+          <Text className={cn("text-5xl font-nunito-bold", textColorClass)}>{value.split(':')[1]}</Text>
         </View>
       </Pressable>
 
@@ -86,14 +98,16 @@ export function TimePicker({
               selectedValue={tempFirst}
               onSelect={setTempFirst}
               modalVisible={visible}
+              color={color}
             />
-            <Text className="text-ink text-2xl font-nunito-bold mt-10">:</Text>
+            <Text className={cn("text-ink text-2xl font-nunito-bold mt-10", textColorClass)}>:</Text>
             <PickerColumn
               label={secondLabel}
               options={secondOptions}
               selectedValue={tempSecond}
               onSelect={setTempSecond}
               modalVisible={visible}
+              color={color}
             />
           </View>
         </DialogContent>
@@ -108,9 +122,10 @@ type PickerColumnProps = {
   selectedValue: string;
   onSelect: (value: string) => void;
   modalVisible: boolean;
+  color?: 'blue' | 'green' | 'default';
 };
 
-function PickerColumn({ label, options, selectedValue, onSelect, modalVisible }: PickerColumnProps) {
+function PickerColumn({ label, options, selectedValue, onSelect, modalVisible, color = 'default' }: PickerColumnProps) {
   const scrollViewRef = useRef<ScrollViewType | null>(null);
   const containerHeightRef = useRef(0);
   const itemHeightRef = useRef(0);
@@ -185,7 +200,12 @@ function PickerColumn({ label, options, selectedValue, onSelect, modalVisible }:
               onLayout={handleItemLayout}
               className={cn(
                 'py-3 items-center',
-                selected && 'bg-garden-green border-garden-green-lip border border-b-4 rounded-lg mx-1 my-1'
+                selected && cn(
+                  'border border-b-4 rounded-lg mx-1 my-1',
+                  color === 'blue' ? 'bg-water-blue border-water-blue-lip' :
+                  color === 'green' ? 'bg-garden-green border-garden-green-lip' :
+                  'bg-garden-green border-garden-green-lip'
+                )
               )}
             >
               <Text
