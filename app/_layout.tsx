@@ -11,6 +11,13 @@ import { useState } from 'react';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Home, Cloud, Droplets, Timer, Map } from 'lucide-react-native';
 import { TabBar } from '@/components/ui/tab-bar';
+import {
+  useFonts,
+  Nunito_400Regular,
+  Nunito_600SemiBold,
+  Nunito_700Bold,
+} from '@expo-google-fonts/nunito';
+import { View, ActivityIndicator } from 'react-native';
 
 
 export {
@@ -49,7 +56,20 @@ const tabs = [
 export default function RootLayout() {
   const [ showAnimation, setShowAnimation] = useState(true);
   const { colorScheme } = useColorScheme();
+  
+  const [fontsLoaded] = useFonts({
+    Nunito_400Regular,
+    Nunito_600SemiBold,
+    Nunito_700Bold,
+  });
 
+  if (!fontsLoaded) {
+    return (
+      <View className="flex-1 items-center justify-center bg-polar">
+        <ActivityIndicator size="large" color="#58CC02" />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaProvider>

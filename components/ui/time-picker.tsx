@@ -81,11 +81,11 @@ export function TimePicker({
         accessibilityRole="button"
       >
         <View className={cn("rounded-2xl bg-snow px-4 py-3 min-w-[80px] items-center flex-1 aspect-square justify-center border-2", borderColorClass)}>
-          <Text className={cn("text-5xl font-nunito-bold", textColorClass)}>{value.split(':')[0]}</Text>
+          <Text className={cn("text-5xl leading-[60px] font-nunito-bold", textColorClass)}>{value.split(':')[0]}</Text>
         </View>
-        <Text className={cn("text-5xl font-nunito-bold", textColorClass)}>:</Text>
+        <Text className={cn("text-5xl leading-[60px] font-nunito-bold", textColorClass)}>:</Text>
         <View className={cn("rounded-2xl bg-snow px-4 py-3 min-w-[80px] items-center flex-1 aspect-square justify-center border-2", borderColorClass)}>
-          <Text className={cn("text-5xl font-nunito-bold", textColorClass)}>{value.split(':')[1]}</Text>
+          <Text className={cn("text-5xl leading-[60px] font-nunito-bold", textColorClass)}>{value.split(':')[1]}</Text>
         </View>
       </Pressable>
 
@@ -210,7 +210,7 @@ function PickerColumn({ label, options, selectedValue, onSelect, modalVisible, c
             >
               <Text
                 className={cn(
-                  'text-lg font-nunito-semibold text-ink',
+                  'text-lg leading-[24px]  w-fullfont-nunito-semibold text-ink',
                   selected && 'text-white font-bold' 
                 )}
               >

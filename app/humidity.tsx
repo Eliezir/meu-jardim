@@ -42,7 +42,7 @@ export default function UmidityScreen() {
           </Text>
           <View className="bg-snow rounded-2xl px-6 py-8 items-center border border-silver">
             <Text className="text-ink-light text-base mb-2">Umidade do Solo</Text>
-            <Text className="text-water-blue text-6xl font-nunito-bold">{currentHumidity}%</Text>
+            <Text className="text-water-blue text-6xl leading-[72px] font-nunito-bold">{currentHumidity}%</Text>
           </View>
         </View>
 
@@ -61,11 +61,11 @@ export default function UmidityScreen() {
                 onChangeText={handleLimitChange}
                 keyboardType="numeric"
                 maxLength={3}
-                className="text-ink text-5xl leading-[60px] flex-1 text-center"
+                className="text-ink text-5xl leading-[60px]"
                 placeholder="40"
                 placeholderTextColor="#777777"
               />
-              <Text className="text-ink text-3xl font-nunito-bold">%</Text>
+              <Text className="text-ink text-3xl font-nunito-bold leading-[60px] w-[36px] text-center">%</Text>
             </View>
           </Pressable>
         </View>
