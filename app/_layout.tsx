@@ -4,17 +4,47 @@ import AnimationScreen from '@/components/AnimationScreen';
 import { NAV_THEME } from '@/lib/theme';
 import { ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
-import { Stack } from 'expo-router';
+import { Tabs } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 import { useState } from 'react';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { Home, Cloud, Droplets, Timer, Map } from 'lucide-react-native';
+import { TabBar } from '@/components/ui/tab-bar';
 
 
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
 } from 'expo-router';
+
+const tabs = [
+  {
+    name: 'index',
+    title: 'Início',
+    icon: Home,
+  },
+  {
+    name: 'schedule',
+    title: 'Agenda',
+    icon: Timer,
+  },
+  {
+    name: 'humidity',
+    title: 'Umidade',
+    icon: Droplets,
+  },
+  {
+    name: 'zones',
+    title: 'Zonas',
+    icon: Map,
+  },
+  {
+    name: 'forecast',
+    title: 'Previsão',
+    icon: Cloud,
+  },
+];
 
 export default function RootLayout() {
   const [ showAnimation, setShowAnimation] = useState(true);
@@ -28,9 +58,27 @@ export default function RootLayout() {
         {!showAnimation && (
           <SafeAreaView edges={['top', 'bottom']} className="flex-1">
             <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen/>
-            </Stack>
+            <Tabs
+              tabBar={(props) => <TabBar {...props} />}
+              screenOptions={{
+                headerShown: false,
+                tabBarActiveTintColor: '#58CC02', // garden-green
+                tabBarInactiveTintColor: '#777777', // ink-light
+              }}>
+              {tabs.map((tab) => {
+                const Icon = tab.icon;
+                return (
+                  <Tabs.Screen
+                    key={tab.name}
+                    name={tab.name}
+                    options={{
+                      title: tab.title,
+                      tabBarIcon: ({ color, size }) => <Icon size={size} color={color} />,
+                    }}
+                  />
+                );
+              })}
+            </Tabs>
             <PortalHost />
           </SafeAreaView>
         )}
