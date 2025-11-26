@@ -18,7 +18,9 @@ export default function AnimationScreen({
 
   useEffect(() => {
     const subscription = player.addListener("playToEnd", () => {
-      setShowAnimation(false);
+      setTimeout(() => {
+        setShowAnimation(false);
+      }, 100);
     });
 
     return () => {
@@ -31,6 +33,8 @@ export default function AnimationScreen({
       <VideoView
         player={player}
         contentFit="contain"
+        nativeControls={false}
+        allowsFullscreen={false}
         style={{
           width: 600,
           height: 400,
