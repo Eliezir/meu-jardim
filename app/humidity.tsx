@@ -33,25 +33,20 @@ export default function UmidityScreen() {
     }
   };
 
-  const handlePress = () => {
-    inputRef.current?.focus();
-    setTimeout(() => {
-      inputRef.current?.setNativeProps({ selection: { start: 0, end: 0 } });
-    }, 100);
-  };
 
   return (
     <>
       <ScreenHeader title="Umidade" />
       <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior="padding"
         className="flex-1"
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
         <ScrollView 
           className="flex-1 bg-polar px-6"
-          contentContainerStyle={{ paddingBottom: 20 }}
+          contentContainerStyle={{ paddingBottom: 20, flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
         <View className="mt-6">
           <Text className="text-ink text-lg font-nunito-semibold mb-2">
@@ -73,7 +68,6 @@ export default function UmidityScreen() {
           <Text className="text-ink-light text-sm mb-4">
             Defina o nível mínimo de umidade. Quando a umidade estiver abaixo deste valor, a irrigação será ativada automaticamente.
           </Text>
-          <Pressable onPress={handlePress}>
             <View className="bg-snow rounded-2xl px-6 py-4 border border-silver flex-row items-center justify-center gap-2 min-h-[120px]" >
               <TextInput
                 ref={inputRef}
@@ -87,7 +81,6 @@ export default function UmidityScreen() {
               />
               <Text className="text-ink text-3xl font-nunito-bold leading-[60px] w-[36px] text-center">%</Text>
             </View>
-          </Pressable>
         </View>
 
         <View className="mt-6 mb-6">
