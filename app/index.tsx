@@ -7,10 +7,13 @@ import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
+import { useSoilHumidityQuery, useIrrigationScheduleQuery } from '@/lib/firebase/queries';
 
 export default function HomeScreen() {
   const router = useRouter();
-    const [isRunning, setIsRunning] = useState(false);
+  const [isRunning, setIsRunning] = useState(false);
+  const { data: currentHumidity } = useSoilHumidityQuery();
+  const { data: schedule } = useIrrigationScheduleQuery();
 
   const timeBasedGreeting = () => {
     const hour = new Date().getHours();
@@ -23,21 +26,32 @@ export default function HomeScreen() {
     }
   };
 
-  // Mock data - replace with real data from Firebase later
   const irrigationData = useMemo(() => {
-    // Example: irrigation scheduled for 2 hours from now
+    if (!schedule) {
+      return {
+        duration: '--',
+        timeLeft: '--',
+      };
+    }
+
+    const [hours, minutes] = schedule.time.split(':').map(Number);
     const now = new Date();
-    const nextIrrigation = new Date(now.getTime() + 2 * 60 * 60 * 1000); // 2 hours from now
-    const timeLeft = Math.floor((nextIrrigation.getTime() - now.getTime()) / (60 * 1000)); // minutes
+    const scheduledTime = new Date();
+    scheduledTime.setHours(hours, minutes, 0, 0);
     
-    const hours = Math.floor(timeLeft / 60);
-    const minutes = timeLeft % 60;
+    if (scheduledTime < now) {
+      scheduledTime.setDate(scheduledTime.getDate() + 1);
+    }
+    
+    const timeLeft = Math.floor((scheduledTime.getTime() - now.getTime()) / (60 * 1000));
+    const hoursLeft = Math.floor(timeLeft / 60);
+    const minutesLeft = timeLeft % 60;
     
     return {
-      duration: '15 min', // Defined irrigation time
-      timeLeft: hours > 0 ? `${hours}h ${minutes}min` : `${minutes}min`,
+      duration: schedule.time,
+      timeLeft: hoursLeft > 0 ? `${hoursLeft}h ${minutesLeft}min` : `${minutesLeft}min`,
     };
-  }, []);
+  }, [schedule]);
 
   type CardItem = {
     id: string;
@@ -67,7 +81,7 @@ export default function HomeScreen() {
     {
       id: 'umidade',
       icon: Droplets,
-      value: '75%',
+      value: currentHumidity !== null ? `${currentHumidity}%` : '--%',
       text: 'Umidade',
       color: 'water-blue',
       width: 'half',
@@ -77,7 +91,7 @@ export default function HomeScreen() {
     {
       id: 'zones',
       icon: Map,
-      value: 3,
+      value: 2,
       text: 'Zonas',
       color: 'garden-green',
       width: 'half',

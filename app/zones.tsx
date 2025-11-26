@@ -2,11 +2,32 @@ import { ScrollView, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { ScreenHeader } from '@/components/ui/screen-header';
 import { TimePicker } from '@/components/ui/time-picker';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useZonesQuery } from '@/lib/firebase/queries';
+import { useUpdateZones } from '@/lib/firebase/mutations';
 
 export default function ZonesScreen() {
-  const [zone1Time, setZone1Time] = useState('15:00');
-  const [zone2Time, setZone2Time] = useState('20:00');
+  const { data: zones } = useZonesQuery();
+  const updateZonesMutation = useUpdateZones();
+  const [zone1Time, setZone1Time] = useState('00:00');
+  const [zone2Time, setZone2Time] = useState('00:00');
+
+  useEffect(() => {
+    if (zones) {
+      setZone1Time(zones.zona1);
+      setZone2Time(zones.zona2);
+    }
+  }, [zones]);
+
+  const handleZone1Change = (time: string) => {
+    setZone1Time(time);
+    updateZonesMutation.mutate({ zona1: time, zona2: zone2Time });
+  };
+
+  const handleZone2Change = (time: string) => {
+    setZone2Time(time);
+    updateZonesMutation.mutate({ zona1: zone1Time, zona2: time });
+  };
 
   return (
     <>
@@ -32,7 +53,7 @@ export default function ZonesScreen() {
             <TimePicker
               mode="minute-second"
               value={zone1Time}
-              onChange={setZone1Time}
+              onChange={handleZone1Change}
               color="blue"
             />
             <View className="mt-4 p-3 bg-white/50 rounded-lg">
@@ -57,7 +78,7 @@ export default function ZonesScreen() {
             <TimePicker
               mode="minute-second"
               value={zone2Time}
-              onChange={setZone2Time}
+              onChange={handleZone2Change}
               color="green"
             />
             <View className="mt-4 p-3 bg-white/50 rounded-lg">

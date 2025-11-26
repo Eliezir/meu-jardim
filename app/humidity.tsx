@@ -1,12 +1,22 @@
 import { ScrollView, View, TextInput, Pressable } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { ScreenHeader } from '@/components/ui/screen-header';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useSoilHumidityQuery, useHumidityLimitQuery } from '@/lib/firebase/queries';
+import { useUpdateHumidityLimit } from '@/lib/firebase/mutations';
 
 export default function UmidityScreen() {
-  const [currentHumidity] = useState(75); // Mock current humidity
-  const [limitHumidity, setLimitHumidity] = useState('40');
+  const { data: currentHumidity } = useSoilHumidityQuery();
+  const { data: limitHumidityData } = useHumidityLimitQuery();
+  const updateLimitMutation = useUpdateHumidityLimit();
+  const [limitHumidity, setLimitHumidity] = useState('');
   const inputRef = useRef<TextInput>(null);
+
+  useEffect(() => {
+    if (limitHumidityData !== undefined) {
+      setLimitHumidity(String(limitHumidityData));
+    }
+  }, [limitHumidityData]);
 
   const handleLimitChange = (value: string) => {
     const numericValue = value.replace(/[^0-9]/g, '');
@@ -19,6 +29,7 @@ export default function UmidityScreen() {
     const numValue = parseInt(numericValue, 10);
     if (numValue >= 0 && numValue <= 100) {
       setLimitHumidity(numericValue);
+      updateLimitMutation.mutate(numValue);
     }
   };
 
@@ -42,7 +53,7 @@ export default function UmidityScreen() {
           </Text>
           <View className="bg-snow rounded-2xl px-6 py-8 items-center border border-silver">
             <Text className="text-ink-light text-base mb-2">Umidade do Solo</Text>
-            <Text className="text-water-blue text-6xl leading-[72px] font-nunito-bold">{currentHumidity}%</Text>
+            <Text className="text-water-blue text-6xl leading-[72px] font-nunito-bold">{currentHumidity ?? '--'}%</Text>
           </View>
         </View>
 

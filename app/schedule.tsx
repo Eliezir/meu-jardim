@@ -3,22 +3,34 @@ import { Text } from '@/components/ui/text';
 import { ScreenHeader } from '@/components/ui/screen-header';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import {TimePicker} from '@/components/ui/time-picker';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useIrrigationScheduleQuery } from '@/lib/firebase/queries';
+import { useUpdateIrrigationSchedule } from '@/lib/firebase/mutations';
 
 export default function TimeScreen() {
+  const { data: schedule } = useIrrigationScheduleQuery();
+  const updateScheduleMutation = useUpdateIrrigationSchedule();
   const [selectedWeekDays, setSelectedWeekDays] = useState<string[]>([]);
-  const [time, setTime] = useState('07:30');
+  const [time, setTime] = useState('');
 
   const weekDays = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
 
+  useEffect(() => {
+    if (schedule) {
+      setTime(schedule.time);
+      setSelectedWeekDays(schedule.weekDays);
+    }
+  }, [schedule]);
 
-const handleTimeChange = (time: string) => {
-  setTime(time);
-};
+  const handleTimeChange = (newTime: string) => {
+    setTime(newTime);
+    updateScheduleMutation.mutate({ time: newTime, weekDays: selectedWeekDays });
+  };
 
-const handleWeekDaysChange = (weekDays: string[]) => {
-  setSelectedWeekDays(weekDays);
-};
+  const handleWeekDaysChange = (weekDays: string[]) => {
+    setSelectedWeekDays(weekDays);
+    updateScheduleMutation.mutate({ time, weekDays });
+  };
 
   return (
     <>
