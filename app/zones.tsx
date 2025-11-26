@@ -74,7 +74,7 @@ export default function ZonesScreen() {
               💡 Como funciona
             </Text>
             <Text className="text-ink-light text-sm leading-5 mb-3">
-              Cada zona representa uma área específica do seu jardim com suas próprias necessidades de irrigação. Quando a irrigação for ativada (por horário agendado ou quando a umidade estiver baixa), cada zona será irrigada pelo tempo configurado.
+              Cada zona representa uma área específica do seu jardim com suas próprias necessidades de irrigação. Quando a irrigação for ativada (por horário agendado quando), cada zona será irrigada pelo tempo configurado.
             </Text>
             <Text className="text-ink-light text-sm leading-5">
               <Text className="font-nunito-semibold">Dica:</Text> Zonas maiores ou com plantas que precisam de mais água devem ter tempos de irrigação maiores. Ajuste os tempos conforme as necessidades específicas de cada área.
