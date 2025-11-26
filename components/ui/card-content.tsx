@@ -31,14 +31,16 @@ export function CardContent({
         <Text className="text-ink-light text-sm font-nunito mt-0.5">
           {text}
         </Text>
-        {secondaryValue !== undefined && secondaryText && (
+        {secondaryValue !== undefined && (
           <>
-            <Text className="text-ink text-lg font-nunito-semibold mt-2">
+            <Text className="text-ink text-base font-nunito-semibold mt-1 capitalize">
               {secondaryValue}
             </Text>
-            <Text className="text-ink-light text-sm font-nunito mt-0.5">
-              {secondaryText}
-            </Text>
+            {secondaryText && (
+              <Text className="text-ink-light text-xs font-nunito mt-0.5">
+                {secondaryText}
+              </Text>
+            )}
           </>
         )}
       </View>

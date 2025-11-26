@@ -9,12 +9,26 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useSoilHumidityQuery, useIrrigationScheduleQuery } from '@/lib/firebase/queries';
 import { getNextScheduleTimeLeft } from '@/lib/utils/irrigation';
+import { useQuery } from '@tanstack/react-query';
+import { getWeatherData } from '@/lib/weather';
 
 export default function HomeScreen() {
   const router = useRouter();
   const [isRunning, setIsRunning] = useState(false);
   const { data: currentHumidity } = useSoilHumidityQuery();
   const { data: schedule } = useIrrigationScheduleQuery();
+
+  const apiKey = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY || '';
+  const latitude = process.env.EXPO_PUBLIC_WEATHER_LAT ? parseFloat(process.env.EXPO_PUBLIC_WEATHER_LAT) : undefined;
+  const longitude = process.env.EXPO_PUBLIC_WEATHER_LON ? parseFloat(process.env.EXPO_PUBLIC_WEATHER_LON) : undefined;
+  const city = process.env.EXPO_PUBLIC_WEATHER_CITY;
+
+  const { data: weatherData } = useQuery({
+    queryKey: ['weather', latitude, longitude, city],
+    queryFn: () => getWeatherData(apiKey, latitude, longitude, city),
+    enabled: !!apiKey,
+    staleTime: 1000 * 60 * 10,
+  });
 
   const timeBasedGreeting = () => {
     const hour = new Date().getHours();
@@ -51,7 +65,7 @@ export default function HomeScreen() {
       icon: Timer,
       value: timeUntilNextIrrigation,
       text: 'Para próxima irrigação',
-      color: 'purple-500',
+      color: 'yellow-500',
       width: 'full',
       minHeight: 80,
       onPress: () => router.push('/schedule'),
@@ -79,11 +93,13 @@ export default function HomeScreen() {
     {
       id: 'forecast',
       icon: Cloud,
-      value: 'Ensolarado',
+      value: weatherData?.current ? `${weatherData.current.temp}°` : '--',
+      secondaryValue: weatherData?.current ? weatherData.current.description : undefined,
+      secondaryText: weatherData?.current ? 'Condição' : undefined,
       text: 'Previsão',
       color: 'warning-orange',
       width: 'full',
-      minHeight: 80,
+      minHeight: 140,
       onPress: () => router.push('/forecast'),
     },
     {
@@ -96,17 +112,13 @@ export default function HomeScreen() {
       minHeight: 80,
       onPress: () => setIsRunning(!isRunning),
     },
-  ], [timeUntilNextIrrigation, currentHumidity, isRunning]);
+  ], [timeUntilNextIrrigation, currentHumidity, isRunning, weatherData]);
 
-  // TODO: Change the celebration message to a forecast message
   return (
     <ScrollView className="flex-1 bg-polar px-6 py-12">
       <View>
         <Text className="text-ink-light text-xl font-semibold">{timeBasedGreeting()},</Text>
         <Text className="text-garden-green text-3xl font-nunito-bold">Dona Verônica</Text>
-        {/* {celebrationMessage && (
-          <Text className="text-ink-light text-base mt-4">{celebrationMessage}</Text>
-        )} */}
       </View>
 
       <View className="mt-8 gap-4 flex-row flex-wrap">
@@ -123,6 +135,8 @@ export default function HomeScreen() {
               icon={card.icon}
               value={card.value}
               text={card.text}
+              secondaryValue={card.secondaryValue}
+              secondaryText={card.secondaryText}
               iconColor={`text-${card.color}`}
             />
           </Button>
