@@ -39,9 +39,6 @@ export function useUpdateIrrigationSchedule() {
     onError: (err, newSchedule, context) => {
       queryClient.setQueryData(['firebase', 'config', 'agendamento'], context?.previous);
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['firebase', 'config', 'agendamento'] });
-    },
   });
 }
 
@@ -60,9 +57,6 @@ export function useUpdateZones() {
     },
     onError: (err, newZones, context) => {
       queryClient.setQueryData(['firebase', 'config', 'zonas'], context?.previous);
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['firebase', 'config', 'zonas'] });
     },
   });
 }

@@ -3,7 +3,7 @@ import { Text } from '@/components/ui/text';
 import { ScreenHeader } from '@/components/ui/screen-header';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import {TimePicker} from '@/components/ui/time-picker';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useIrrigationScheduleQuery } from '@/lib/firebase/queries';
 import { useUpdateIrrigationSchedule } from '@/lib/firebase/mutations';
 
@@ -12,24 +12,56 @@ export default function TimeScreen() {
   const updateScheduleMutation = useUpdateIrrigationSchedule();
   const [selectedWeekDays, setSelectedWeekDays] = useState<string[]>([]);
   const [time, setTime] = useState('');
+  const isInitialMount = useRef(true);
+  const lastScheduleRef = useRef<string>('');
+  const isMutatingRef = useRef(false);
 
   const weekDays = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
 
   useEffect(() => {
-    if (schedule) {
-      setTime(schedule.time);
-      setSelectedWeekDays(schedule.weekDays);
+    if (isMutatingRef.current) {
+      isMutatingRef.current = false;
+      return;
+    }
+    
+    if (schedule && schedule.time && schedule.weekDays) {
+      const scheduleKey = `${schedule.time}-${schedule.weekDays.join(',')}`;
+      if (isInitialMount.current || scheduleKey !== lastScheduleRef.current) {
+        if (schedule.time && schedule.weekDays.length > 0) {
+          setTime(schedule.time);
+          setSelectedWeekDays(schedule.weekDays);
+          lastScheduleRef.current = scheduleKey;
+          isInitialMount.current = false;
+        }
+      }
     }
   }, [schedule]);
 
   const handleTimeChange = (newTime: string) => {
+    if (!newTime || newTime === '00:00') return;
     setTime(newTime);
-    updateScheduleMutation.mutate({ time: newTime, weekDays: selectedWeekDays });
+    const currentWeekDays = selectedWeekDays.length > 0 ? selectedWeekDays : (schedule?.weekDays || []);
+    if (currentWeekDays.length > 0) {
+      isMutatingRef.current = true;
+      updateScheduleMutation.mutate({ 
+        time: newTime, 
+        weekDays: currentWeekDays 
+      });
+    }
   };
 
   const handleWeekDaysChange = (weekDays: string[]) => {
     setSelectedWeekDays(weekDays);
-    updateScheduleMutation.mutate({ time, weekDays });
+    if (weekDays.length > 0) {
+      const currentTime = time || schedule?.time;
+      if (currentTime && currentTime !== '00:00') {
+        isMutatingRef.current = true;
+        updateScheduleMutation.mutate({ 
+          time: currentTime, 
+          weekDays 
+        });
+      }
+    }
   };
 
   return (

@@ -2,7 +2,7 @@ import { ScrollView, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { ScreenHeader } from '@/components/ui/screen-header';
 import { TimePicker } from '@/components/ui/time-picker';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useZonesQuery } from '@/lib/firebase/queries';
 import { useUpdateZones } from '@/lib/firebase/mutations';
 
@@ -11,22 +11,53 @@ export default function ZonesScreen() {
   const updateZonesMutation = useUpdateZones();
   const [zone1Time, setZone1Time] = useState('00:00');
   const [zone2Time, setZone2Time] = useState('00:00');
+  const isInitialMount = useRef(true);
+  const lastZonesRef = useRef<string>('');
+  const isMutatingRef = useRef(false);
 
   useEffect(() => {
-    if (zones) {
-      setZone1Time(zones.zona1);
-      setZone2Time(zones.zona2);
+    if (isMutatingRef.current) {
+      isMutatingRef.current = false;
+      return;
+    }
+    
+    if (zones && zones.zona1 && zones.zona2) {
+      const zonesKey = `${zones.zona1}-${zones.zona2}`;
+      if (isInitialMount.current || zonesKey !== lastZonesRef.current) {
+        if (zones.zona1 !== '00:00' || zones.zona2 !== '00:00' || isInitialMount.current) {
+          setZone1Time(zones.zona1);
+          setZone2Time(zones.zona2);
+          lastZonesRef.current = zonesKey;
+          isInitialMount.current = false;
+        }
+      }
     }
   }, [zones]);
 
   const handleZone1Change = (time: string) => {
+    if (!time || time === '00:00') return;
     setZone1Time(time);
-    updateZonesMutation.mutate({ zona1: time, zona2: zone2Time });
+    const currentZone2 = zone2Time !== '00:00' ? zone2Time : (zones?.zona2 || '00:00');
+    if (currentZone2 !== '00:00') {
+      isMutatingRef.current = true;
+      updateZonesMutation.mutate({ 
+        zona1: time, 
+        zona2: currentZone2 
+      });
+    }
   };
 
   const handleZone2Change = (time: string) => {
+    if (!time || time === '00:00') return;
     setZone2Time(time);
-    updateZonesMutation.mutate({ zona1: zone1Time, zona2: time });
+    const currentZone1 = zone1Time !== '00:00' ? zone1Time : (zones?.zona1 || '00:00');
+    if (currentZone1 !== '00:00') {
+      isMutatingRef.current = true;
+      updateZonesMutation.mutate({ 
+        zona1: currentZone1, 
+        zona2: time 
+      });
+    }
   };
 
   return (
