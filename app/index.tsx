@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useSoilHumidityQuery, useIrrigationScheduleQuery } from '@/lib/firebase/queries';
+import { getNextScheduleTimeLeft } from '@/lib/utils/irrigation';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -26,31 +27,8 @@ export default function HomeScreen() {
     }
   };
 
-  const irrigationData = useMemo(() => {
-    if (!schedule) {
-      return {
-        duration: '--',
-        timeLeft: '--',
-      };
-    }
-
-    const [hours, minutes] = schedule.time.split(':').map(Number);
-    const now = new Date();
-    const scheduledTime = new Date();
-    scheduledTime.setHours(hours, minutes, 0, 0);
-    
-    if (scheduledTime < now) {
-      scheduledTime.setDate(scheduledTime.getDate() + 1);
-    }
-    
-    const timeLeft = Math.floor((scheduledTime.getTime() - now.getTime()) / (60 * 1000));
-    const hoursLeft = Math.floor(timeLeft / 60);
-    const minutesLeft = timeLeft % 60;
-    
-    return {
-      duration: schedule.time,
-      timeLeft: hoursLeft > 0 ? `${hoursLeft}h ${minutesLeft}min` : `${minutesLeft}min`,
-    };
+  const timeUntilNextIrrigation = useMemo(() => {
+    return getNextScheduleTimeLeft(schedule);
   }, [schedule]);
 
   type CardItem = {
@@ -71,8 +49,8 @@ export default function HomeScreen() {
     {
       id: 'schedule',
       icon: Timer,
-      value: irrigationData.duration,
-      text: 'Para aproxima irrigação',
+      value: timeUntilNextIrrigation,
+      text: 'Para próxima irrigação',
       color: 'purple-500',
       width: 'full',
       minHeight: 80,
@@ -118,7 +96,7 @@ export default function HomeScreen() {
       minHeight: 80,
       onPress: () => setIsRunning(!isRunning),
     },
-  ], [irrigationData, isRunning]);
+  ], [timeUntilNextIrrigation, currentHumidity, isRunning]);
 
   // TODO: Change the celebration message to a forecast message
   return (
