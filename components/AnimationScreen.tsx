@@ -18,9 +18,7 @@ export default function AnimationScreen({
 
   useEffect(() => {
     const subscription = player.addListener("playToEnd", () => {
-      setTimeout(() => {
         setShowAnimation(false);
-      }, 100);
     });
 
     return () => {
@@ -29,7 +27,7 @@ export default function AnimationScreen({
   }, [player, setShowAnimation]);
 
   return (
-    <View className="flex-1 items-center justify-center bg-[#f4f4f4] px-6 dark:bg-black">
+    <View className="flex-1 items-center justify-center bg-[#f4f4f4] px-6">
       <VideoView
         player={player}
         contentFit="contain"

@@ -1,4 +1,4 @@
-import { ScrollView, View, TextInput, Pressable } from 'react-native';
+import { ScrollView, View, TextInput, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { ScreenHeader } from '@/components/ui/screen-header';
 import { useState, useRef, useEffect } from 'react';
@@ -43,7 +43,16 @@ export default function UmidityScreen() {
   return (
     <>
       <ScreenHeader title="Umidade" />
-      <ScrollView className="flex-1 bg-polar px-6">
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        className="flex-1"
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      >
+        <ScrollView 
+          className="flex-1 bg-polar px-6"
+          contentContainerStyle={{ paddingBottom: 20 }}
+          keyboardShouldPersistTaps="handled"
+        >
         <View className="mt-6">
           <Text className="text-ink text-lg font-nunito-semibold mb-2">
             Umidade Atual
@@ -94,7 +103,8 @@ export default function UmidityScreen() {
             </Text>
           </View>
         </View>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </>
   );
 }
