@@ -1,6 +1,23 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
-import { getSoilHumidity, listenToSoilHumidity, readFromDatabase } from './realtime';
+import { useEffect, useMemo } from 'react';
+import { getSoilHumidity, listenToSoilHumidity, readFromDatabase, HumidityData } from './realtime';
+
+function isESP32Connected(humidityData: HumidityData | null): boolean {
+  if (!humidityData || !humidityData.updatedAt || humidityData.updatedAt.trim() === '') {
+    return false;
+  }
+  
+  const updatedAt = new Date(humidityData.updatedAt);
+  
+  if (isNaN(updatedAt.getTime())) {
+    return false;
+  }
+  
+  const now = new Date();
+  const diffMinutes = (now.getTime() - updatedAt.getTime()) / (1000 * 60);
+  
+  return diffMinutes <= 10;
+}
 
 export function useSoilHumidityQuery() {
   const queryClient = useQueryClient();
@@ -15,8 +32,8 @@ export function useSoilHumidityQuery() {
   });
   
   useEffect(() => {
-    const unsubscribe = listenToSoilHumidity((humidity) => {
-      queryClient.setQueryData(queryKey, humidity);
+    const unsubscribe = listenToSoilHumidity((data) => {
+      queryClient.setQueryData(queryKey, data);
     });
     
     return () => {
@@ -24,7 +41,23 @@ export function useSoilHumidityQuery() {
     };
   }, [queryClient, queryKey]);
   
-  return query;
+  const isConnected = useMemo(() => {
+    return isESP32Connected(query.data ?? null);
+  }, [query.data]);
+  
+  const displayValue = useMemo(() => {
+    if (!isConnected || !query.data) {
+      return null;
+    }
+    return query.data.value;
+  }, [isConnected, query.data]);
+  
+  return {
+    ...query,
+    data: query.data,
+    isConnected,
+    displayValue,
+  };
 }
 
 export function useHumidityLimitQuery() {
@@ -61,7 +94,7 @@ export function useZonesQuery() {
 }
 
 export function useSoilHumidity(): number | null {
-  const { data: humidity } = useSoilHumidityQuery();
-  return humidity ?? null;
+  const { displayValue } = useSoilHumidityQuery();
+  return displayValue;
 }
 

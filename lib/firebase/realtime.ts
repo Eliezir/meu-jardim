@@ -56,11 +56,47 @@ export function listenToDatabase<T = any>(
   };
 }
 
-export async function getSoilHumidity(): Promise<number | null> {
-  return readFromDatabase<number>('/sensores/umidade_solo');
+export interface HumidityData {
+  value: number;
+  updatedAt: string;
 }
 
-export function listenToSoilHumidity(callback: (humidity: number | null) => void): () => void {
-  return listenToDatabase<number>('/sensores/umidade_solo', callback);
+export async function getSoilHumidity(): Promise<HumidityData | null> {
+  const data = await readFromDatabase<HumidityData | number>('/sensores/umidade_solo');
+  
+  if (data === null) {
+    return null;
+  }
+  
+  if (typeof data === 'number') {
+    return null;
+  }
+  
+  if (!data.updatedAt || typeof data.value !== 'number') {
+    return null;
+  }
+  
+  return data;
+}
+
+export function listenToSoilHumidity(callback: (data: HumidityData | null) => void): () => void {
+  return listenToDatabase<HumidityData | number>('/sensores/umidade_solo', (data) => {
+    if (data === null) {
+      callback(null);
+      return;
+    }
+    
+    if (typeof data === 'number') {
+      callback(null);
+      return;
+    }
+    
+    if (!data.updatedAt || typeof data.value !== 'number') {
+      callback(null);
+      return;
+    }
+    
+    callback(data);
+  });
 }
 

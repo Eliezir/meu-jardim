@@ -6,7 +6,7 @@ import { useSoilHumidityQuery, useHumidityLimitQuery } from '@/lib/firebase/quer
 import { useUpdateHumidityLimit } from '@/lib/firebase/mutations';
 
 export default function UmidityScreen() {
-  const { data: currentHumidity } = useSoilHumidityQuery();
+  const { displayValue, isConnected } = useSoilHumidityQuery();
   const { data: limitHumidityData } = useHumidityLimitQuery();
   const updateLimitMutation = useUpdateHumidityLimit();
   const [limitHumidity, setLimitHumidity] = useState('');
@@ -56,8 +56,15 @@ export default function UmidityScreen() {
             Nível de umidade atual do solo no seu jardim.
           </Text>
           <View className="bg-snow rounded-2xl px-6 py-8 items-center border border-silver">
+            {!isConnected && (
+              <View className="mb-4 bg-alert-red/10 rounded-lg px-4 py-2 border border-alert-red/30">
+                <Text className="text-alert-red text-sm font-nunito-semibold text-center">
+                  ESP32 não conectado
+                </Text>
+              </View>
+            )}
             <Text className="text-ink-light text-base mb-2">Umidade do Solo</Text>
-            <Text className="text-water-blue text-6xl leading-[72px] font-nunito-bold">{currentHumidity ?? '--'}%</Text>
+            <Text className="text-water-blue text-6xl leading-[72px] font-nunito-bold">{displayValue !== null ? `${displayValue}%` : '--%'}</Text>
           </View>
         </View>
 

@@ -15,7 +15,7 @@ import { getWeatherData } from '@/lib/weather';
 export default function HomeScreen() {
   const router = useRouter();
   const [isRunning, setIsRunning] = useState(false);
-  const { data: currentHumidity } = useSoilHumidityQuery();
+  const { displayValue, isConnected } = useSoilHumidityQuery();
   const { data: schedule } = useIrrigationScheduleQuery();
 
   const apiKey = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY || '';
@@ -73,9 +73,9 @@ export default function HomeScreen() {
     {
       id: 'umidade',
       icon: Droplets,
-      value: currentHumidity !== null ? `${currentHumidity}%` : '--%',
-      text: 'Umidade',
-      color: 'water-blue',
+      value: displayValue !== null ? `${displayValue}%` : 'N/A',
+      text: isConnected ? 'Umidade' : 'ESP32 desconectado',
+      color: isConnected ? 'water-blue' : 'alert-red',
       width: 'half',
       minHeight: 80,
       onPress: () => router.push('/humidity'),
@@ -112,7 +112,7 @@ export default function HomeScreen() {
       minHeight: 80,
       onPress: () => setIsRunning(!isRunning),
     },
-  ], [timeUntilNextIrrigation, currentHumidity, isRunning, weatherData]);
+  ], [timeUntilNextIrrigation, displayValue, isConnected, isRunning, weatherData]);
 
   return (
     <ScrollView className="flex-1 bg-polar px-6 py-12">
