@@ -1,7 +1,6 @@
-import { useEffect } from "react";
-import { View } from "react-native";
+import { useEffect, useRef } from "react";
+import { Animated } from "react-native";
 import { VideoView, useVideoPlayer } from "expo-video";
-import { Text } from "react-native";
 
 interface AnimatedScreenProps {
   setShowAnimation: React.Dispatch<React.SetStateAction<boolean>>;
@@ -10,24 +9,37 @@ interface AnimatedScreenProps {
 export default function AnimationScreen({
   setShowAnimation,
 }: AnimatedScreenProps) {
+  const opacity = useRef(new Animated.Value(1)).current;
+
   const player = useVideoPlayer(require("@/assets/splash/video.mp4"), (playerInstance) => {
-    playerInstance.loop = true;
+    playerInstance.loop = false;
     playerInstance.muted = true;
     playerInstance.play();
   });
 
   useEffect(() => {
     const subscription = player.addListener("playToEnd", () => {
-        setShowAnimation(false);
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }).start(({ finished }) => {
+        if (finished) {
+          setShowAnimation(false);
+        }
+      });
     });
 
     return () => {
       subscription.remove();
-    };
-  }, [player, setShowAnimation]);
+    }; 
+  }, [opacity, player, setShowAnimation]);
 
   return (
-    <View className="flex-1 items-center justify-center bg-[#f4f4f4] px-6">
+    <Animated.View
+      className="flex-1 items-center justify-center bg-[#f4f4f4] px-6"
+      style={{ opacity }}
+    >
       <VideoView
         player={player}
         contentFit="contain"
@@ -35,10 +47,10 @@ export default function AnimationScreen({
         allowsFullscreen={false}
         style={{
           width: 600,
-          height: 400,
-          marginRight: 60,
+          height: 600,
+
         }}
       />
-    </View>
+    </Animated.View>
   );
 }
