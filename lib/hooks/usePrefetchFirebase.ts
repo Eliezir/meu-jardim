@@ -24,8 +24,20 @@ export function usePrefetchFirebase() {
     queryClient.prefetchQuery({
       queryKey: ['firebase', 'config', 'agendamento'],
       queryFn: async () => {
-        const schedule = await readFromDatabase<{ time: string; weekDays: string[] }>('/config/agendamento');
-        return schedule ?? { time: '07:30', weekDays: [] };
+        const schedule = await readFromDatabase<{ time: string; weekDays: Record<string, boolean> | string[] }>('/config/agendamento');
+        if (!schedule) {
+          return { time: '07:30', weekDays: [] };
+        }
+        
+        let weekDaysArray: string[] = [];
+        if (Array.isArray(schedule.weekDays)) {
+          weekDaysArray = schedule.weekDays;
+        } else if (typeof schedule.weekDays === 'object' && schedule.weekDays !== null) {
+          const weekDaysObj = schedule.weekDays as Record<string, boolean>;
+          weekDaysArray = Object.keys(weekDaysObj).filter((day) => weekDaysObj[day] === true);
+        }
+        
+        return { time: schedule.time, weekDays: weekDaysArray };
       },
       staleTime: 1000 * 60 * 5,
     });

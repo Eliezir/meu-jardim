@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "meu-jardim",
+    "name": "Meu Jardim",
     "slug": "meu-jardim",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -17,14 +17,19 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.eliezirmoreira.meujardim",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.eliezirmoreira.meujardim"
     },
     "web": {
       "bundler": "metro",
@@ -37,6 +42,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "6581e001-ec11-4f92-944f-74aca3c7bfc7"
+      }
     }
   }
 }

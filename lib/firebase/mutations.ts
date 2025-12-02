@@ -28,7 +28,15 @@ export function useUpdateIrrigationSchedule() {
   
   return useMutation({
     mutationFn: async (schedule: { time: string; weekDays: string[] }) => {
-      await writeToDatabase('/config/agendamento', schedule);
+      const weekDaysObj: Record<string, boolean> = {};
+      schedule.weekDays.forEach(day => {
+        weekDaysObj[day] = true;
+      });
+      
+      await writeToDatabase('/config/agendamento', {
+        time: schedule.time,
+        weekDays: weekDaysObj
+      });
     },
     onMutate: async (newSchedule) => {
       await queryClient.cancelQueries({ queryKey: ['firebase', 'config', 'agendamento'] });

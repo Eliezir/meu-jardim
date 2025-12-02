@@ -7,16 +7,25 @@ function isESP32Connected(humidityData: HumidityData | null): boolean {
     return false;
   }
   
-  const updatedAt = new Date(humidityData.updatedAt);
+  let updatedAt = new Date(humidityData.updatedAt);
   
   if (isNaN(updatedAt.getTime())) {
     return false;
   }
   
   const now = new Date();
-  const diffMinutes = (now.getTime() - updatedAt.getTime()) / (1000 * 60);
+  const diffMs = now.getTime() - updatedAt.getTime();
+  const diffMinutes = diffMs / (1000 * 60);
   
-  return diffMinutes <= 10;
+  let adjustedUpdatedAt = updatedAt;
+  if (diffMinutes > 170 && diffMinutes < 190) {
+    adjustedUpdatedAt = new Date(updatedAt.getTime() + 3 * 60 * 60 * 1000);
+  }
+  
+  const adjustedDiffMs = now.getTime() - adjustedUpdatedAt.getTime();
+  const adjustedDiffMinutes = adjustedDiffMs / (1000 * 60);
+  
+  return adjustedDiffMinutes <= 10;
 }
 
 export function useSoilHumidityQuery() {
@@ -75,8 +84,20 @@ export function useIrrigationScheduleQuery() {
   return useQuery({
     queryKey: ['firebase', 'config', 'agendamento'],
     queryFn: async () => {
-      const schedule = await readFromDatabase<{ time: string; weekDays: string[] }>('/config/agendamento');
-      return schedule ?? { time: '07:30', weekDays: [] };
+      const schedule = await readFromDatabase<{ time: string; weekDays: Record<string, boolean> | string[] }>('/config/agendamento');
+      if (!schedule) {
+        return { time: '07:30', weekDays: [] };
+      }
+      
+      let weekDaysArray: string[] = [];
+      if (Array.isArray(schedule.weekDays)) {
+        weekDaysArray = schedule.weekDays;
+      } else if (schedule.weekDays && typeof schedule.weekDays === 'object') {
+        const weekDaysObj = schedule.weekDays as Record<string, boolean>;
+        weekDaysArray = Object.keys(weekDaysObj).filter((day) => weekDaysObj[day] === true);
+      }
+      
+      return { time: schedule.time, weekDays: weekDaysArray };
     },
     staleTime: 1000 * 60 * 5,
   });

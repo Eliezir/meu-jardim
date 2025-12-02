@@ -84,9 +84,9 @@ function AppContent({
 
   return (
     <SafeAreaProvider>
-      <ThemeProvider value={NAV_THEME['light']}>
+      <ThemeProvider value={NAV_THEME.light}>
         <SafeAreaView edges={['top', 'bottom']} className="flex-1">
-          <StatusBar style="dark" />
+          <StatusBar style="light" />
           {isConnected ? (
             <>
               <Tabs
