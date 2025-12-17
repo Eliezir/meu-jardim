@@ -1,118 +1,159 @@
-# Minimal Template
+# 🌱 Meu Jardim
 
-This is a [React Native](https://reactnative.dev/) project built with [Expo](https://expo.dev/) and [React Native Reusables](https://reactnativereusables.com).
+Aplicativo mobile para controle e monitoramento de sistema de irrigação IoT baseado em ESP32. Desenvolvido com foco em acessibilidade para usuários idosos com baixa visão, oferecendo uma interface amigável, intuitiva e fácil de usar.
 
-It was initialized using the following command:
+## 📱 Sobre o Projeto
 
+**Meu Jardim** é um aplicativo companion para sistemas de irrigação automatizados. O app permite monitorar a umidade do solo, configurar zonas de irrigação, agendar regas e visualizar previsões do tempo, tudo com uma interface inspirada no Duolingo - colorida, com fontes grandes e alta acessibilidade.
+
+### Características Principais
+
+- 🎯 **Interface Acessível**: Design otimizado para usuários idosos com baixa visão
+- 📊 **Monitoramento em Tempo Real**: Sincronização com Firebase Realtime Database
+- 💧 **Controle de Umidade**: Visualização e configuração de limites de umidade do solo
+- 🌍 **Zonas de Irrigação**: Configuração individual de múltiplas zonas
+- ⏰ **Agendamento**: Sistema de agendamento de irrigações
+- 🌤️ **Previsão do Tempo**: Integração com OpenWeather API
+- 📴 **Modo Offline**: Funcionalidade mesmo sem conexão com internet
+
+## 🛠️ Tecnologias Utilizadas
+
+- **React Native** (0.81.5) - Framework mobile
+- **Expo** (54.0.0) - Plataforma de desenvolvimento
+- **TypeScript** (5.9.2) - Tipagem estática
+- **Expo Router** (6.0.10) - Roteamento baseado em arquivos
+- **NativeWind** (4.2.1) - Tailwind CSS para React Native
+- **TanStack Query** (5.90.11) - Gerenciamento de estado do servidor
+- **Firebase** (12.6.0) - Realtime Database para sincronização
+- **Lucide React Native** - Ícones
+- **React Native Reanimated** - Animações performáticas
+
+## 📋 Pré-requisitos
+
+Antes de começar, certifique-se de ter instalado:
+
+- **Node.js** (versão 18 ou superior)
+- **Bun** (gerenciador de pacotes) ou **npm/yarn**
+- **Expo CLI** (instalado globalmente ou via npx)
+- **Conta Firebase** com projeto configurado
+- **Conta OpenWeather** (opcional, para previsão do tempo)
+
+## 🚀 Instalação
+
+1. Clone o repositório:
 ```bash
-npx @react-native-reusables/cli@latest init -t meu-jardim
+git clone https://github.com/Eliezir/meu-jardim.git
+cd meu-jardim
 ```
 
-## Getting Started
-
-To run the development server:
-
+2. Instale as dependências:
 ```bash
-    npm run dev
-    # or
-    yarn dev
-    # or
-    pnpm dev
-    # or
-    bun dev
+bun install
 ```
 
-This will start the Expo Dev Server. Open the app in:
+3. Configure as variáveis de ambiente:
+Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
 
-- **iOS**: press `i` to launch in the iOS simulator _(Mac only)_
-- **Android**: press `a` to launch in the Android emulator
-- **Web**: press `w` to run in a browser
+```env
+# Firebase Configuration
+EXPO_PUBLIC_FIREBASE_API_KEY=sua-api-key
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=seu-auth-domain
+EXPO_PUBLIC_FIREBASE_DATABASE_URL=sua-database-url
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=seu-project-id
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=seu-storage-bucket
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=seu-messaging-sender-id
+EXPO_PUBLIC_FIREBASE_APP_ID=seu-app-id
 
-You can also scan the QR code using the [Expo Go](https://expo.dev/go) app on your device. This project fully supports running in Expo Go for quick testing on physical devices.
-
-## Project Structure
-
-```
-app/
- ├─ _layout.tsx                # wraps AppProviders + Animation gate
- └─ (tabs)/                    # tab routes: home, umidity, time, zones, forecast
-src/
- ├─ components/FeatureCard.tsx # shared UI for navigation cards
- ├─ hooks/useFeatureIcon.ts    # shared hooks/utilities
- ├─ providers/AppProviders.tsx # QueryClient + Firebase bootstrap
- ├─ services/firebase/         # Firebase config & handles
- └─ features/
-     └─ <feature>/
-         ├─ api/queries.ts     # TanStack Query hooks hitting Firestore
-         ├─ components/        # UI specific to the feature
-         ├─ hooks/             # thin wrappers around queries
-         └─ types.ts           # co-located TypeScript contracts
+# OpenWeather API (Opcional)
+EXPO_PUBLIC_OPENWEATHER_API_KEY=sua-openweather-api-key
+EXPO_PUBLIC_WEATHER_LAT=-23.5505
+EXPO_PUBLIC_WEATHER_LON=-46.6333
+EXPO_PUBLIC_WEATHER_CITY=São Paulo
 ```
 
-Each tab screen imports presentation components and hooks from `src/features/<feature>` so UI and data contracts remain modular and testable.
-
-## Data & Providers
-
-- `AppProviders` instantiates a shared `QueryClient`, registers focus tracking, and ensures Firebase initializes once.
-- Screens consume data through TanStack Query hooks so caching, refetching, and optimistic updates stay consistent.
-- Shared components (e.g., `FeatureCard`) live under `src/components` to avoid circular dependencies with feature modules.
-
-## Firebase Setup
-
-1. Create a Firebase project and enable Firestore.
-2. Add the following environment variables (e.g., in `.env` or your terminal session). Expo exposes any `EXPO_PUBLIC_*` variable:
-
-```
-EXPO_PUBLIC_FIREBASE_API_KEY=...
-EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=...
-EXPO_PUBLIC_FIREBASE_PROJECT_ID=...
-EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=...
-EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
-EXPO_PUBLIC_FIREBASE_APP_ID=...
-EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID=...
+4. Inicie o servidor de desenvolvimento:
+```bash
+bun dev
 ```
 
-3. Populate the Firestore collections referenced by each feature (`home_highlights`, `umidity_metrics`, `time_windows`, `garden_zones`, `forecast_days`).
+## 📱 Executando o App
 
-If collections are empty, the UI falls back to sensible demo data so new environments still render correctly.
+### iOS
+```bash
+bun ios
+```
 
-## Adding Feature Modules
+### Android
+```bash
+bun android
+```
 
-When introducing a new surface area:
+### Web
+```bash
+bun web
+```
 
-1. Create `src/features/<feature>/{api,components,hooks,types}`.
-2. Start with a query in `api/queries.ts` that reads or writes Firestore using helpers from `src/services/firebase/config`.
-3. Wrap the query with a hook in `hooks/` so screens never import API modules directly.
-4. Build UI primitives inside `components/` and connect them inside the relevant `app/(tabs)` screen.
+## 📁 Estrutura do Projeto
 
-This keeps routing, presentation, and data layers loosely coupled while following Expo Router conventions.
+```
+meu-jardim/
+├── app/                    # Telas do aplicativo (Expo Router)
+│   ├── index.tsx          # Tela inicial (Home)
+│   ├── humidity.tsx       # Tela de umidade
+│   ├── zones.tsx          # Tela de zonas
+│   ├── schedule.tsx       # Tela de agendamento
+│   ├── forecast.tsx       # Tela de previsão do tempo
+│   └── _layout.tsx        # Layout principal
+├── components/            # Componentes reutilizáveis
+│   ├── ui/                # Componentes de UI
+│   └── AnimationScreen.tsx
+├── lib/                   # Lógica de negócio
+│   ├── firebase/          # Configuração e queries do Firebase
+│   │   ├── config.ts
+│   │   ├── queries.ts
+│   │   ├── mutations.ts
+│   │   └── realtime.ts
+│   ├── hooks/             # Custom hooks
+│   │   ├── useIrrigationCountdown.ts
+│   │   ├── useNetworkStatus.ts
+│   │   ├── usePrefetchFirebase.ts
+│   │   └── usePrefetchWeather.ts
+│   ├── utils/             # Utilitários
+│   │   └── irrigation.ts
+│   ├── query-client.ts    # Configuração do React Query
+│   ├── theme.ts           # Configuração de tema
+│   └── weather.ts         # Integração com OpenWeather
+├── assets/                # Imagens e recursos
+├── tailwind.config.js     # Configuração do Tailwind
+└── package.json
+```
 
-## Project Features
+## 🎨 Funcionalidades
 
-- ⚛️ Built with [Expo Router](https://expo.dev/router)
-- 🎨 Styled with [Tailwind CSS](https://tailwindcss.com/) via [Nativewind](https://www.nativewind.dev/)
-- 📦 UI powered by [React Native Reusables](https://github.com/founded-labs/react-native-reusables)
-- 🚀 New Architecture enabled
-- 🔥 Edge to Edge enabled
-- 📱 Runs on iOS, Android, and Web
+### Tela Inicial (Home)
+- Saudação personalizada baseada no horário
+- Contador para próxima irrigação
+- Status de umidade atual do solo
+- Acesso rápido às zonas de irrigação
+- Previsão do tempo
+- Controle de início/pausa da irrigação
 
-## Learn More
+### Tela de Umidade
+- Visualização da umidade atual do solo
+- Configuração do limite mínimo de umidade
+- Informações sobre níveis ideais de umidade
 
-To dive deeper into the technologies used:
+### Tela de Zonas
+- Listagem de todas as zonas de irrigação
+- Configuração individual de cada zona
+- Duração de irrigação por zona
 
-- [React Native Docs](https://reactnative.dev/docs/getting-started)
-- [Expo Docs](https://docs.expo.dev/)
-- [Nativewind Docs](https://www.nativewind.dev/)
-- [React Native Reusables](https://reactnativereusables.com)
+### Tela de Agendamento
+- Visualização do cronograma de irrigações
+- Configuração de horários
 
-## Deploy with EAS
+### Tela de Previsão
+- Previsão do tempo atual
+- Informações meteorológicas relevantes
 
-The easiest way to deploy your app is with [Expo Application Services (EAS)](https://expo.dev/eas).
 
-- [EAS Build](https://docs.expo.dev/build/introduction/)
-- [EAS Updates](https://docs.expo.dev/eas-update/introduction/)
-- [EAS Submit](https://docs.expo.dev/submit/introduction/)
-
----
-
-If you enjoy using React Native Reusables, please consider giving it a ⭐ on [GitHub](https://github.com/founded-labs/react-native-reusables). Your support means a lot!
