@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo } from 'react';
-import { getSoilHumidity, listenToSoilHumidity, readFromDatabase, HumidityData } from './realtime';
+import { getSoilHumidity, listenToSoilHumidity, readFromDatabase, HumidityData, getIrrigationStatus, listenToIrrigationStatus, IrrigationStatus } from './realtime';
 
 function isESP32Connected(humidityData: HumidityData | null): boolean {
   if (!humidityData || !humidityData.updatedAt || humidityData.updatedAt.trim() === '') {
@@ -117,5 +117,30 @@ export function useZonesQuery() {
 export function useSoilHumidity(): number | null {
   const { displayValue } = useSoilHumidityQuery();
   return displayValue;
+}
+
+export function useIrrigationStatusQuery() {
+  const queryClient = useQueryClient();
+  const queryKey = ['firebase', 'irrigation', 'status'];
+  
+  const query = useQuery({
+    queryKey,
+    queryFn: async () => {
+      return getIrrigationStatus();
+    },
+    staleTime: 0,
+  });
+  
+  useEffect(() => {
+    const unsubscribe = listenToIrrigationStatus((data) => {
+      queryClient.setQueryData(queryKey, data);
+    });
+    
+    return () => {
+      unsubscribe();
+    };
+  }, [queryClient, queryKey]);
+  
+  return query;
 }
 

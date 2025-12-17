@@ -2,21 +2,25 @@ import { Text } from '@/components/ui/text';
 import { Button } from '@/components/ui/button';
 import { CardContent } from '@/components/ui/card-content';
 import { ScrollView, View } from 'react-native';
-import { Timer, Droplets, Map, Cloud, Play, Square } from 'lucide-react-native';
+import { Timer, Droplets, Map, Cloud, Play, Square, Clock } from 'lucide-react-native';
 import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { useSoilHumidityQuery, useIrrigationScheduleQuery } from '@/lib/firebase/queries';
+import { useSoilHumidityQuery, useIrrigationScheduleQuery, useIrrigationStatusQuery, useZonesQuery } from '@/lib/firebase/queries';
 import { getNextScheduleTimeLeft } from '@/lib/utils/irrigation';
 import { useQuery } from '@tanstack/react-query';
 import { getWeatherData } from '@/lib/weather';
+import { useIrrigationCountdown } from '@/lib/hooks/useIrrigationCountdown';
 
 export default function HomeScreen() {
   const router = useRouter();
   const [isRunning, setIsRunning] = useState(false);
   const { displayValue, isConnected } = useSoilHumidityQuery();
   const { data: schedule } = useIrrigationScheduleQuery();
+  const { data: zones } = useZonesQuery();
+  const { data: irrigationStatus } = useIrrigationStatusQuery();
+  const { isActive: isIrrigating, longestZoneRemaining } = useIrrigationCountdown(irrigationStatus, schedule, zones);
 
   const apiKey = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY || '';
   const latitude = process.env.EXPO_PUBLIC_WEATHER_LAT ? parseFloat(process.env.EXPO_PUBLIC_WEATHER_LAT) : undefined;
@@ -45,6 +49,25 @@ export default function HomeScreen() {
     return getNextScheduleTimeLeft(schedule);
   }, [schedule]);
 
+  // Determine what to show in the timer widget
+  const timerDisplay = useMemo(() => {
+    if (isIrrigating && longestZoneRemaining) {
+      return {
+        value: longestZoneRemaining.formatted,
+        text: 'Tempo restante',
+        icon: Clock,
+        color: 'garden-green',
+      };
+    } else {
+      return {
+        value: timeUntilNextIrrigation,
+        text: 'Para próxima irrigação',
+        icon: Timer,
+        color: 'yellow-500',
+      };
+    }
+  }, [isIrrigating, longestZoneRemaining, timeUntilNextIrrigation]);
+
   type CardItem = {
     id: string;
     icon: typeof Timer;
@@ -62,10 +85,10 @@ export default function HomeScreen() {
   const cardItems: CardItem[] = useMemo(() => [
     {
       id: 'schedule',
-      icon: Timer,
-      value: timeUntilNextIrrigation,
-      text: 'Para próxima irrigação',
-      color: 'yellow-500',
+      icon: timerDisplay.icon,
+      value: timerDisplay.value,
+      text: timerDisplay.text,
+      color: timerDisplay.color,
       width: 'full',
       minHeight: 80,
       onPress: () => router.push('/schedule'),
@@ -112,7 +135,7 @@ export default function HomeScreen() {
       minHeight: 80,
       onPress: () => setIsRunning(!isRunning),
     },
-  ], [timeUntilNextIrrigation, displayValue, isConnected, isRunning, weatherData]);
+  ], [timerDisplay, displayValue, isConnected, isRunning, weatherData]);
 
   return (
     <ScrollView className="flex-1 bg-polar px-6 py-12">

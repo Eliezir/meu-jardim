@@ -100,3 +100,21 @@ export function listenToSoilHumidity(callback: (data: HumidityData | null) => vo
   });
 }
 
+export interface IrrigationStatus {
+  isActive: boolean;
+  zone1EndTime?: number; // Unix timestamp in seconds
+  zone2EndTime?: number; // Unix timestamp in seconds
+  startTime?: number; // Unix timestamp in seconds
+}
+
+export async function getIrrigationStatus(): Promise<IrrigationStatus | null> {
+  const data = await readFromDatabase<IrrigationStatus>('/irrigation/status');
+  return data;
+}
+
+export function listenToIrrigationStatus(callback: (data: IrrigationStatus | null) => void): () => void {
+  return listenToDatabase<IrrigationStatus>('/irrigation/status', (data) => {
+    callback(data);
+  });
+}
+
